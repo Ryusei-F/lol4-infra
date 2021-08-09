@@ -1,0 +1,113 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: 
+  IAM Create
+
+Metadata: 
+  "AWS::CloudFormation::Interface": 
+    ParameterGroups: 
+      - Label: 
+          default: "Project Name Prefix"
+        Parameters: 
+          - PJPrefix
+
+# ------------------------------------------------------------#
+# Input Parameters
+# ------------------------------------------------------------# 
+Parameters:
+  PJPrefix:
+    Type: String
+    Default: "lol4"
+
+Resources: 
+# ------------------------------------------------------------#
+#  SecurityGroup for EC2
+# ------------------------------------------------------------#
+# SG Create
+  rEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties: 
+      # AdditionalInfo: String
+      # Affinity: String
+      AvailabilityZone: ap-northeast-1a
+      # BlockDeviceMappings:
+      #   - DeviceName: /dev/sda1
+      #     Ebs: 
+      #       VolumeType: "gp2"
+      #       VolumeSize: 1
+      #       DeleteOnTermination: "false"
+      # CpuOptions: 
+      #   CpuOptions
+      # CreditSpecification: 
+      #   CreditSpecification
+      # DisableApiTermination: "false"
+      # EbsOptimized: "false"
+      # ElasticGpuSpecifications: 
+      #   - ElasticGpuSpecification
+      # ElasticInferenceAccelerators: 
+      #   - ElasticInferenceAccelerator
+      # EnclaveOptions: 
+      #   EnclaveOptions
+      # HibernationOptions: 
+      #   HibernationOptions
+      # HostId: String
+      # HostResourceGroupArn: String
+      IamInstanceProfile: 
+        Fn::ImportValue: !Sub "${PJPrefix}-iaminstanceprofile"
+      ImageId: ami-09ebacdc178ae23b7
+      # InstanceInitiatedShutdownBehavior: stop
+      InstanceType: t2.micro
+      # Ipv6AddressCount: Integer
+      # Ipv6Addresses: 
+      #   - InstanceIpv6Address
+      # KernelId: String
+      KeyName: "lol4ec2"
+      # LaunchTemplate: 
+      #   LaunchTemplateSpecification
+      # LicenseSpecifications: 
+      #   - LicenseSpecification
+      Monitoring: "false"
+      NetworkInterfaces: 
+        - AssociatePublicIpAddress: "true"
+          DeleteOnTermination: "true"
+          Description: !Sub "${PJPrefix}-eni"
+          DeviceIndex: "0"
+          GroupSet: 
+            - Fn::ImportValue: !Sub "${PJPrefix}-sg"
+          # Ipv6AddressCount: Integer
+          # Ipv6Addresses: 
+          #   - InstanceIpv6Address
+          # NetworkInterfaceId: String
+          # PrivateIpAddress: String
+          # PrivateIpAddresses: 
+          #   - PrivateIpAddressSpecification
+          # SecondaryPrivateIpAddressCount: Integer
+          SubnetId: 
+            Fn::ImportValue: !Sub "${PJPrefix}-public-subnet-a"
+      # PlacementGroupName: String
+      # PrivateIpAddress: String
+      # RamdiskId: String
+      # SecurityGroupIds: 
+      #   - String
+      # SecurityGroups: 
+      #   - String
+      # SourceDestCheck: Boolean
+      # SsmAssociations: 
+      #   - SsmAssociation
+      # SubnetId: String
+      Tags: 
+        - Key: Name
+          Value: !Sub "${PJPrefix}-EC2Instance"
+      # Tenancy: String
+      # UserData: String
+      # Volumes: 
+      #   - Volume
+
+# ------------------------------------------------------------#
+# Output Parameters
+# ------------------------------------------------------------#                
+Outputs:
+# VPC
+  oEC2Instance:
+    Value: !Ref rEC2Instance
+    Export:
+      Name: !Sub "${PJPrefix}-ec2instance"

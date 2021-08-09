@@ -1,0 +1,73 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: 
+  IAM Create
+
+Metadata: 
+  "AWS::CloudFormation::Interface": 
+    ParameterGroups: 
+      - Label: 
+          default: "Project Name Prefix"
+        Parameters: 
+          - PJPrefix
+
+# ------------------------------------------------------------#
+# Input Parameters
+# ------------------------------------------------------------# 
+Parameters:
+  PJPrefix:
+    Type: String
+    Default: "lol4"
+
+Resources: 
+# ------------------------------------------------------------#
+#  SecurityGroup for EC2
+# ------------------------------------------------------------#
+# SG Create
+  rIAMRoleForEC2:
+    Type: AWS::IAM::Role
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "ec2.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Description: !Sub "${PJPrefix}-iamrole"
+      ManagedPolicyArns: 
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AmazonSSMFullAccess
+        - arn:aws:iam::aws:policy/IAMFullAccess
+      MaxSessionDuration: 3600
+      Path: "/"
+      # PermissionsBoundary: String
+      # Policies: 
+      #   - Policy
+      RoleName: !Sub "${PJPrefix}-iamrole"
+      Tags: 
+        - Key: Name
+          Value: !Sub "${PJPrefix}-IAM-EC2"
+  rIAMInstanceProfileForEC2:
+    Type: AWS::IAM::InstanceProfile
+    Properties: 
+      InstanceProfileName: !Sub "${PJPrefix}-iaminstanceprofile"
+      Path: "/"
+      Roles: 
+        - !Ref rIAMRoleForEC2
+
+# ------------------------------------------------------------#
+# Output Parameters
+# ------------------------------------------------------------#                
+Outputs:
+# VPC
+  oIAMrole:
+    Value: !Ref rIAMRoleForEC2
+    Export:
+      Name: !Sub "${PJPrefix}-iamrole"
+  oIAMInstanceProfile:
+    Value: !Ref rIAMInstanceProfileForEC2
+    Export:
+      Name: !Sub "${PJPrefix}-iaminstanceprofile"

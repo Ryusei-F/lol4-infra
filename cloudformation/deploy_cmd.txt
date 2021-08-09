@@ -1,0 +1,13 @@
+[VPC,Subnet,RouteTable,Route]
+$ aws cloudformation create-stack --template-body file://./vpc.yaml --stack-name DISCORD-VPC --profile <プロファイル名>
+[SecurityGroup]
+$ aws cloudformation create-stack --template-body file://./sg.yaml --stack-name DISCORD-SG --profile <プロファイル名>
+[IAMRole,IAMInstanceProfile]
+$ aws cloudformation create-stack --template-body file://./iam.yaml --stack-name DISCORD-IAM --capabilities CAPABILITY_NAMED_IAM --profile <プロファイル名>
+[EC2Instance]
+aws cloudformation create-stack --template-body file://./ec2.yaml --stack-name DISCORD-EC2 --profile <プロファイル名>
+
+Note:
+  SecurityGroupはSubnet, EC2InstanceはSubnet/SecurityGroup,IAMInstanceProfileを参照している。
+  参照元を先にデプロイしてから参照先をデプロイすること。
+ 
